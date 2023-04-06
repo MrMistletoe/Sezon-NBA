@@ -1,0 +1,208 @@
+---
+title: "Statystyki NBA sezon 21-22 oraz ikony ligi NBA"
+author: "Bartłomiej Fijołek"
+date: today
+format: 
+  html:
+    warning: false
+    message: false
+    echo: false
+    self-contained: true  
+editor: visual
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(gt)
+library(flextable)
+library(rio)
+library(ggplot2)
+library(kableExtra)
+library(gtsummary)
+```
+
+```{r}
+load("konferencja_wschodnia.rda")
+load("konferencja_zachodnia.rda")
+tabela_stat <- import("tabela_stat.xlsx")
+tabela_stat_MJ <- import("tabela_stat_MJ.xlsx")
+tabela_stat_BR <- import("tabela-stat-BR.xlsx")
+tabela_stat_LJ <- import("tabela-stat-LJ.xlsx")
+```
+
+# 
+
+**Czym jest NBA?**
+
+**National Basketball Association** (skrót ang. NBA) amerykańsko-kanadyjska liga koszykarska, o charakterze profesjonalnym. Tworzy ją 30 zespołów, w tym: 29 z Stanów Zjednoczonych i jeden z Kanady. Liga jest aktywnym członkiem USA Basketball, oddziału Fédération Internationale de Basketball na terytorium Stanów Zjednoczonych. Jej komisarzem od 1 lutego 2014 roku jest **Adam Silver**. NBA jest jedną z pięciu największych północnoamerykańskich zawodowych lig sportowych (oprócz niej NFL, NHL, MLS i MLB). Gracze NBA są najlepiej opłacanymi sportowcami świata (w średniej rocznych zarobków). (Patrz więcej informacji @national2022 ) W historii NBA najwięcej tytułów zdobyły: Boston Celtics --- 16, Los Angeles Lakers --- 15 i Chicago Bulls --- 6; do najlepszych zawodników NBA należeli m.in.: K. Abdul-Jabbar, L. Bird, W. Chamberlain, B. Cousy, **J. Erving**, J. Havlicek, E. „Magic" Johnson, M. Jordan, M. Malone, G. Mikan, S. O'Neal, B. Pettit, O. Robertson, **B. Russell**, J. West (poniżej aktualne logo ligi).![Aktualne logo ligi](images/NBA-Logo%20(1).png){width="612"}
+
+# Podsumowanie sezonu 21-22 w NBA
+
+Sezon regularny w amerykańskiej koszykówce rozpoczął się 19 października 2021 roku, a zakończył 10 kwietnia 2022 roku. Następnie została rozegrana faza play-off, która potrwała do 16 czerwca 2022 roku. Sezon regularny składa się z **82** meczów, każdy z meczy jest podzielony na 4 kwarty po 12 minut i jeśli po takim czasie jest remis to drużyny grają dogrywki, które trwają 5 minut i jeśli po dogrywce wynik dalej jest remisowy to grają następne 5 minut do momentu rozstrzygnięcia meczu. W lidze występuje 30 drużyn, które są podzielone na 2 konferencje- **wschodnią** i **zachodnią**.
+
+```{r}
+#| label: tbl-konferencja-wschodnia
+#| tbl-cap: Konferencja wschodnia
+
+konferencja_wschodnia %>% 
+  flextable() %>% 
+  set_header_labels(numeracja="",
+                    wygrane="W",
+                    przegrane="L",
+                    procent_wygranych="W/L(%)") %>% 
+  autofit()
+
+```
+
+W @tbl-konferencja-wschodnia znajdują się zwycięstwa, porażki oraz procentowa ilość zwycięstw z sezonu regularnego z konferencji wschodniej.
+
+```{r}
+#| label: tbl-konferencja-zachodnia
+#| tbl-cap: Konferencja zachodnia
+
+konferencja_zachodnia %>% 
+  flextable() %>% 
+  set_header_labels(numeracja="",
+                    team1="team",
+                    wygrane1="W",
+                    przegrane1="L",
+                    procent_wygranych1="W/L(%)") %>% 
+  autofit()
+```
+
+W @tbl-konferencja-zachodnia znajdują się zwycięstwa, porażki oraz procentowa ilość zwycięstw z sezonu regularnego z konferencji zachodniej.
+
+```{r}
+#| label: tbl-statystyki-druzyn
+#| tbl-cap: Statystyki drużyn
+
+tabela_stat %>%
+mutate(
+MP = cell_spec(MP, "html", color = ifelse(MP >= 241.34, "orange", "blue")),
+FG = cell_spec(FG, "html", color = ifelse(FG >= 40.6, "orange", "blue")),
+FGA = cell_spec(FGA, "html", color = ifelse(FGA >= 88.1, "orange", "blue")),
+`FG%` = cell_spec(`FG%`, "html", color = ifelse(`FG%` >= 0.461, "orange", "blue")),
+`3P` = cell_spec(`3P`, "html", color = ifelse(`3P` >= 12.4, "orange", "blue")),
+`3PA` = cell_spec(`3PA`, "html", color = ifelse(`3PA` >= 35.2, "orange", "blue")),
+`3P%` = cell_spec(`3P%`, "html", color = ifelse(`3P%` >= 0.354, "orange", "blue")),
+`2P` = cell_spec(`2P`, "html", color = ifelse(`2P` >= 28.2, "orange", "blue")),
+`2PA` = cell_spec(`2PA`, "html", color = ifelse(`2PA` >= 52.9, "orange", "blue")),
+`2P%` = cell_spec(`2P%`, "html", color = ifelse(`2P%` >= 0.533, "orange", "blue")),
+FT = cell_spec(FT, "html", color = ifelse(FT >= 16.9, "orange", "blue")),
+FTA = cell_spec(FTA, "html", color = ifelse(FTA >= 21.9, "orange", "blue")),
+`FT%` = cell_spec(`FT%`, "html", color = ifelse(`FT%` >= 0.775, "orange", "blue")),
+`ORB` = cell_spec(`ORB`, "html", color = ifelse(`ORB` >= 10.3, "orange", "blue")),
+`DRB` = cell_spec(`DRB`, "html", color = ifelse(`DRB` >= 34.1, "orange", "blue")),
+`TRB` = cell_spec(`TRB`, "html", color = ifelse(`TRB` >= 44.5, "orange", "blue")),
+`AST` = cell_spec(`AST`, "html", color = ifelse(`AST` >= 24.6, "orange", "blue")),
+`STL` = cell_spec(`STL`, "html", color = ifelse(`STL` >= 7.6, "orange", "blue")),
+`BLK` = cell_spec(`BLK`, "html", color = ifelse(`BLK` >= 4.7, "orange", "blue")),
+`TOV` = cell_spec(`TOV`, "html", color = ifelse(`TOV` >= 13.8, "orange", "blue")),
+`PF` = cell_spec(`PF`, "html", color = ifelse(`PF` >= 19.6, "orange", "blue")),
+`PTS` = cell_spec(`PTS`, "html", color = ifelse(`PTS` >= 110.6, "orange", "blue"))) %>%
+kbl(format = "html", escape = F) %>%
+kable_styling(bootstrap_options = "striped", font_size = 12) %>%
+row_spec(17, bold = T, color = "white", background = "green") %>%
+row_spec(19, bold = T, color = "white", background = "red") %>% 
+row_spec(15, bold = T, color = "black", background = "yellow") 
+```
+
+W tabeli @tbl-statystyki-druzyn są ukazane statystyki szczegółowe poszczególnych drużyn. Na kolor **zielony** zaznaczona jest drużyna z najlepszym bilansem zwycięstw w sezonie zasadniczym, na **czerwono** drużyna z najgorszym bilansem zwycięstw, zaś na **żółto** drużyna która zdobyła mistrzostwo. Liczby w poszczególnych kolumnach są również zaznaczone dwoma kolorami, **pomarańczowy** oznacza wynik powyżej średniej wszystkich zespołów, z kolei **niebieski** kolor oznacza wynik poniżej średniej. Drużyny, które mają przy swojej nazwie \* dostały się do fazy play-off. Jeszcze więcej statystyk możemy znaleźć pod linkiem @2021-22
+
+```{r}
+#| label: tbl-wybrane-srednie-ligi
+#| tbl-cap: Wybrane statystyki ligi
+theme_gtsummary_printer("gt")
+tabela_stat %>% 
+  select(PTS,`FG%`,`2P%`, `3P%`,`FT%`,TRB) %>% 
+  tbl_summary(statistic = list(all_continuous() ~ "{min} | {mean}  | {max} "))
+```
+
+W @tbl-wybrane-srednie-ligi jest ukazana minimalna, średnia oraz maksymalna ilość z całej ligi. Dla przykładu minimalna ilość średnio zdobytych punktów w sezonie 2021-2022 wyniosła 103.7, średnia wyniosła 110.6 zaś największa ilość średnio zdobytych punktów wyniosła 115.9 .
+
+### Objaśnienie skrótów:
+
+*Team*- drużyna, *G*- rozegrane gry, *MP*- średnio rozegrane minuty, *FG*- średnio trafione rzuty, *FGA*-średnia liczba prób rzutu, *FG%*-średni procent trafionych rzutów, *3P*- średnio trafione rzuty za 3 punkty, *3PA*- średnia ilość prób rzutu za 3 punkty, *3P%*- procent rzutów trafionych za 3 punkty, *2P*- średnia ilość rzutów trafionych za 2 punkty, *2PA*- średnia ilość oddanych rzutów za 2 punkty, *2P%*- procent rzutów trafionych za 2, *FT*- średnio trafione rzuty osobiste, *FTA*- średnia ilość oddanych rzutów osobistych, *FT%*- procent trafionych rzutów osobistych, *ORB*- średnia ilość zbiórek ofensywnych, *DRB*- średnia ilość zbiórek w defensywie, *TRB*- średnia liczba zbiórek w trakcie meczu, *AST*- średnia ilość asyst, *STL*- średnia ilość przechwytów, *BLK*- średnia ilość bloków, *TOV*- średnia ilość strat, *PF*- średnia ilość fauli, *PTS*- średnia ilość zdobytych punktów
+
+# Epokowi zawodnicy NBA
+
+Amerykańska liga koszykówki przechodziła przez wiele etapów rozwoju. Sama w sobie nie mogłaby istnieć bez topowych zawodników. Na wstępie podałem zawodników, którzy w znacznym stopniu przysłużyli się do rozwoju ligi. Teraz z kolei zajmę się kilkoma z nich, aby pokazać ich wyniki.
+
+### Bill Russell
+
+**William Felton "Bill" Russell** (ur. 12 lutego 1934 w Monroe, zm. 31 lipca 2022 w Mercer Island) -- amerykański koszykarz i pierwszy czarnoskóry trener w NBA, jedenastokrotny mistrz z drużyną Boston Celtics (w tym dwukrotnie jako grający trener). Mistrz olimpijski w koszykówce mężczyzn z Melbourne w 1956. @billrus2022
+
+![Bill Russell](images/220731133015-01-bill-russell-obit%20(1)-01.jpg)
+
+```{r}
+#| label: tbl-statystyki-BR
+#| tbl-cap: Statystyki Billa Russella
+tabela_stat_BR %>%
+kbl() %>%
+kable_styling(bootstrap_options = "striped", font_size = 12) %>%
+row_spec(4, bold = T, color = "white", background = "green")
+```
+
+W tabeli @tbl-statystyki-BR są umieszczone statystyki z podziałem na sezony. Wiersz zaznaczony na kolor zielony pokazuje najlepszy sezon jaki Bostońskiego koszykarza.
+
+```{r}
+tabela_stat_BR %>%
+ggplot(aes(x=Season,y=TRB,fill=MP))+
+geom_col()
+```
+
+Wykres słupkowy przedstawia ilość zbiórek w podziale na sezony, zaś kolor kolumn oznacza średnią ilość minut rozegranych w danym sezonie. Łatwo można zauważyć że Bill najwięcej piłek(24.7) zbierał w sezonie 1963-64 i grał wtedy średnio 44.6 minut na mecz.
+
+### Earvin "Magic" Johnson
+
+**Magic Johnson** (właśc. **Earvin Johnson Jr.** ur. 14 sierpnia 1959 w Lansing) -- amerykański koszykarz, grający w drużynie Los Angeles Lakers w latach 80. i na początku 90. XX wieku. Po zdobyciu tytułów mistrzowskich w szkole średniej i w college'u, Johnson został wybrany z pierwszym numerem w drafcie NBA 1979 przez Los Angeles Lakers. W swym debiutanckim sezonie zdobył mistrzostwo i nagrodę najbardziej wartościowego gracza finałów NBA. W latach 80. zdobył kolejne cztery tytuły z Lakersami. Na sportową emeryturę odszedł nagle w 1991 po tym, jak ogłosił, że uległ zakażeniu wirusem HIV, ale powrócił w 1992 na mecz gwiazd, gdzie otrzymał nagrodę MVP. Po protestach niektórych zawodników ponownie zakończył karierę, by powrócić raz jeszcze w 1996 roku, w wieku 37 lat, rozgrywając 32 mecze w zespole Lakers i po raz trzeci i ostatni odejść od uprawiania zawodowego sportu. @magicjo2022
+
+![Magic Johnson](images/magic-johnson-action-portrait_header.jpeg){width="659"}
+
+```{r}
+#| label: tbl-statystyki-MJ
+#| tbl-cap: Statystyki Magica Johnsona
+tabela_stat_MJ %>%
+kbl() %>%
+kable_styling(bootstrap_options = "striped", font_size = 12) %>%
+row_spec(1, bold = T, color = "white", background = "green")
+```
+
+W tabeli @tbl-statystyki-MJ są umieszczone statystyki z podziałem na sezony. Wiersz zaznaczony na kolor zielony pokazuje sezon, w którym Earvin zdobył mistrzostwo ligi jednocześnie będąc MVP finałów.
+
+```{r}
+tabela_stat_MJ %>%
+ggplot(aes(x=Season,y=`AST`,fill=PTS))+
+geom_col()
+```
+
+Wykres słupkowy przedstawia ilość asyst w podziale na sezony, zaś kolor kolumn oznacza średnią ilość punktów zdobytych w danym sezonie. Przydomek który otrzymał Earvin Johnson nie był przypadkowy. "Magic" przoduje w średniej ilości asyst w sezonie (13.1) na mecz, a niektóre z podań, jakie wykonywał były dosłownie magiczne.
+
+## LeBron "King" James
+
+**LeBron James** (ur. 30 grudnia 1984 w Akron, Ohio) -- amerykański koszykarz znany z gry przede wszystkim w Cleveland Cavaliers w NBA. Jego nominalna pozycja to niski skrzydłowy, lecz warunki fizyczne Jamesa (dynamika, waga) oraz jego wyjątkowy przegląd pola sprawiają, że trudno jest przyporządkować mu pozycję według tradycyjnych kryteriów, gdyż w praktyce może on pełnić zarówno rolę rozgrywającego, jak i silnego skrzydłowego. Otrzymał nagrodę najbardziej wartościowego gracza (MVP) ligi w sezonach 2008/2009, 2009/2010, 2011/2012, 2012/2013 oraz MVP finałów -- 2012, 2013,2016 i 2020. @lebronj2022
+
+![LeBron James](images/basketball-LeBron-James-Cleveland-Cavaliers-2018.webp){width="311"}
+
+```{r}
+#| label: tbl-statystyki-LJ
+#| tbl-cap: Statystyki LeBrona Jamesa
+tabela_stat_LJ %>%
+kbl() %>%
+kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  row_spec(19, bold = T, color = "white", background = "green")
+```
+
+W tabeli @tbl-statystyki-LJ są umieszczone statystyki z podziałem na sezony. Wiersz zaznaczony kolorem zielonym oznacza najlepszy sezon Jamesa pod względem zdobytych punktów.
+
+```{r, fig.width=12}
+tabela_stat_LJ %>%
+ggplot(aes(x=Season,y=PTS,fill=TRB))+
+geom_col()
+```
+
+Wykres słupkowy przedstawia ilość punktów w podziale na sezony, zaś kolor kolumn oznacza średnią ilość zbiórek zdobytych w danym sezonie. "King James" jest drugim zawodnikiem w historii NBA pod względem zdobytych punktów. Mówiąc konkretniej ma ich aktualnie na koncie **37 870** co daje **27.1** pkt/mecz przy skuteczności **50.5%** (stan na 03.01.2023r.)
